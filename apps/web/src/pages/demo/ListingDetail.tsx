@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { defaultScoringConfig, demoListings, scoreListing } from "@easyfinderai/shared";
+import { defaultScoringConfig, demoListings as rawListings, scoreListing } from "@easyfinderai/shared";
 import ImageGallery from "../../components/ImageGallery";
 import { useDemoWatchlist } from "../../lib/demoWatchlist";
 import { formatCategory } from "../../lib/formatters";
@@ -26,12 +26,17 @@ type DemoListing = {
   createdAt: string;
 };
 
+type RawDemoListing = Omit<DemoListing, "id"> & { id?: string };
+
 export default function DemoListingDetail({ listingId }: Props) {
   const params = useParams();
   const effectiveId = listingId ?? params.id;
 
-  const listingSource: DemoListing[] = demoListings;
-  const listing: DemoListing | undefined = listingSource.find((item: DemoListing) => item.id === effectiveId);
+  const demoListings: DemoListing[] = (rawListings as RawDemoListing[]).map((l: RawDemoListing, idx: number) => ({
+    ...l,
+    id: l.id ?? `demo-${idx}`,
+  }));
+  const listing: DemoListing | undefined = demoListings.find((item: DemoListing) => item.id === effectiveId);
   const watchlist = useDemoWatchlist();
 
   if (!listing) {
