@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { defaultScoringConfig, demoListings, scoreListing } from "@easyfinderai/shared";
-import type { Listing } from "@easyfinderai/shared";
 import ImageGallery from "../../components/ImageGallery";
 import { useDemoWatchlist } from "../../lib/demoWatchlist";
 import { formatCategory } from "../../lib/formatters";
@@ -9,9 +8,23 @@ type Props = {
   listingId?: string;
 };
 
-interface DemoListing extends Listing {
+type DemoListing = {
+  id: string;
+  title: string;
+  description: string;
+  state: string;
+  price: number;
+  hours: number;
+  operable: boolean;
+  is_operable?: boolean;
+  year?: number;
+  condition?: number;
+  category: string;
   imageUrl?: string;
-}
+  images?: string[];
+  source: string;
+  createdAt: string;
+};
 
 export default function DemoListingDetail({ listingId }: Props) {
   const params = useParams();
@@ -29,7 +42,13 @@ export default function DemoListingDetail({ listingId }: Props) {
     );
   }
 
-  const breakdown = scoreListing(listing, defaultScoringConfig);
+  const imageUrl = listing.imageUrl ?? listing.images?.[0] ?? "";
+  const listingForScoring: DemoListing & { imageUrl: string } = {
+    ...listing,
+    imageUrl,
+  };
+
+  const breakdown = scoreListing(listingForScoring, defaultScoringConfig);
   const components = breakdown.breakdown ?? {};
   const rationale = breakdown.reasons ?? [];
   const confidence = breakdown.confidence ?? 0;
