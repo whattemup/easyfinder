@@ -18,6 +18,8 @@ const weightLabels: Record<keyof ScoringConfig["weights"], string> = {
 
 const isEnterpriseUser = (role?: string | null) => role === "admin";
 
+type Weights = Record<string, number>;
+
 export const ScoringConfigs = () => {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
@@ -47,7 +49,21 @@ export const ScoringConfigs = () => {
   });
 
   const config = draftConfig ?? defaultScoringConfig;
-  const weights = (config.weights ?? {}) as Partial<Record<keyof ScoringConfig["weights"], number>>;
+  const weights: Weights = Object.entries(config.weights ?? {}).reduce<Weights>(
+    (accumulator, [key, value]) => {
+      if (typeof value === "number") {
+        accumulator[key] = value;
+      } else if (typeof value === "string") {
+        const parsedValue = Number.parseFloat(value);
+        accumulator[key] = Number.isNaN(parsedValue) ? 0 : parsedValue;
+      } else {
+        accumulator[key] = 0;
+      }
+
+      return accumulator;
+    },
+    {}
+  );
   const enterprise = isEnterpriseUser(user?.role);
 
   const sampleListing = demoListings[0];
@@ -56,7 +72,10 @@ export const ScoringConfigs = () => {
     [config, sampleListing]
   );
 
-  const totalWeight = Object.values(weights).reduce((sum: number, value: number | undefined) => sum + (value ?? 0), 0);
+  const totalWeight: number = Object.values(weights).reduce(
+    (sum: number, value: number) => sum + value,
+    0
+  );
 
   const confidence = sampleScore.confidence ?? 0;
   const reasons = sampleScore.reasons ?? [];
