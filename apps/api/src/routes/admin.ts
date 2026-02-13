@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { parse } from "csv-parse/sync";
 import { listings, sourceHealth } from "../store.js";
@@ -27,12 +27,26 @@ const csvSchema = z.object({
   source: z.string(),
 });
 
+const requireAuthenticatedUserId = (request: FastifyRequest, reply: FastifyReply) => {
+  const userId = request.user?.id;
+  if (!userId) {
+    fail(request, reply, "UNAUTHORIZED", "Authentication required.", 401);
+    return null;
+  }
+  return userId;
+};
+
 export default async function adminRoutes(app: FastifyInstance) {
   app.post(
     "/ingest/csv",
     { preHandler: [app.authenticate, requirePlan(["enterprise"]), disableWritesInDemo] },
     async (request, reply) => {
-    if (!adminOnly.has(request.user.role)) {
+    const userId = requireAuthenticatedUserId(request, reply);
+    if (!userId) {
+      return;
+    }
+    const userRole = request.user?.role;
+    if (!userRole || !adminOnly.has(userRole)) {
       return fail(request, reply, "FORBIDDEN", "Admin access only.", 403);
     }
     const data = await request.file();
@@ -74,7 +88,12 @@ export default async function adminRoutes(app: FastifyInstance) {
     "/sources/sync",
     { preHandler: [app.authenticate, requirePlan(["enterprise"]), disableWritesInDemo] },
     async (request, reply) => {
-    if (!adminOnly.has(request.user.role)) {
+    const userId = requireAuthenticatedUserId(request, reply);
+    if (!userId) {
+      return;
+    }
+    const userRole = request.user?.role;
+    if (!userRole || !adminOnly.has(userRole)) {
       return fail(request, reply, "FORBIDDEN", "Admin access only.", 403);
     }
 
@@ -106,7 +125,12 @@ export default async function adminRoutes(app: FastifyInstance) {
     "/sources",
     { preHandler: [app.authenticate, requirePlan(["enterprise"])] },
     async (request, reply) => {
-    if (!adminOnly.has(request.user.role)) {
+    const userId = requireAuthenticatedUserId(request, reply);
+    if (!userId) {
+      return;
+    }
+    const userRole = request.user?.role;
+    if (!userRole || !adminOnly.has(userRole)) {
       return fail(request, reply, "FORBIDDEN", "Admin access only.", 403);
     }
 
