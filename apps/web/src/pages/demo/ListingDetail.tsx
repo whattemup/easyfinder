@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { defaultScoringConfig, demoListings, scoreListing } from "@easyfinderai/shared";
+import type { Listing } from "@easyfinderai/shared";
 import ImageGallery from "../../components/ImageGallery";
 import { useDemoWatchlist } from "../../lib/demoWatchlist";
 import { formatCategory } from "../../lib/formatters";
@@ -8,11 +9,16 @@ type Props = {
   listingId?: string;
 };
 
+interface DemoListing extends Listing {
+  imageUrl?: string;
+}
+
 export default function DemoListingDetail({ listingId }: Props) {
   const params = useParams();
   const effectiveId = listingId ?? params.id;
 
-  const listing = (demoListings as Array<{ id?: string }>).find((l: { id?: string }) => l.id === effectiveId);
+  const listingSource: DemoListing[] = demoListings;
+  const listing: DemoListing | undefined = listingSource.find((item: DemoListing) => item.id === effectiveId);
   const watchlist = useDemoWatchlist();
 
   if (!listing) {
@@ -28,7 +34,7 @@ export default function DemoListingDetail({ listingId }: Props) {
   const rationale = breakdown.reasons ?? [];
   const confidence = breakdown.confidence ?? 0;
 
-  const currentListingId = listing?.id ?? "";
+  const currentListingId = listing.id;
   const isSaved = currentListingId
     ? watchlist.isInWatchlist(currentListingId)
     : false;
