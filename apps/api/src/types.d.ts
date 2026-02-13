@@ -10,7 +10,7 @@ declare module "fastify" {
       id: string;
       email: string;
       name?: string;
-      role: "demo" | "buyer" | "seller" | "admin";
+      role: "demo" | "buyer" | "seller" | "enterprise" | "admin" | null;
       ndaAccepted?: boolean;
       ndaAcceptedAt?: Date | null;
     };
@@ -32,7 +32,7 @@ declare module "@fastify/jwt" {
       id: string;
       email: string;
       name?: string;
-      role: "demo" | "buyer" | "seller" | "admin";
+      role: "demo" | "buyer" | "seller" | "enterprise" | "admin" | null;
       ndaAccepted?: boolean;
       ndaAcceptedAt?: Date | null;
     };
@@ -40,7 +40,7 @@ declare module "@fastify/jwt" {
       id: string;
       email: string;
       name?: string;
-      role: "demo" | "buyer" | "seller" | "admin";
+      role: "demo" | "buyer" | "seller" | "enterprise" | "admin" | null;
       ndaAccepted?: boolean;
       ndaAcceptedAt?: Date | null;
     };

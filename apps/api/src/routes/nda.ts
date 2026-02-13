@@ -5,13 +5,6 @@ import { getUsersCollection } from "../users.js";
 import { fail, ok } from "../response.js";
 import { audit } from "../lib/audit.js";
 
-type UserDocument = {
-  _id: ObjectId;
-  ndaAccepted?: boolean;
-  ndaAcceptedAt?: Date | null;
-  ndaVersion?: string;
-};
-
 const acceptSchema = z.object({
   accepted: z.literal(true),
 });
@@ -19,7 +12,7 @@ const acceptSchema = z.object({
 export default async function ndaRoutes(app: FastifyInstance) {
   const usersCollection = () => getUsersCollection();
 
-  app.get("/status", { preHandler: app.authenticate }, async (request, reply) => {
+  app.get("/status", { preHandler: app.authenticate }, async (request) => {
     try {
       const col = usersCollection();
       if (!ObjectId.isValid(request.user.id)) {

@@ -40,10 +40,10 @@ describe("scoring engine", () => {
     );
 
     expect(better.total ?? 0).toBeGreaterThan(worse.total ?? 0);
-    expect(better.breakdown.price).toBeGreaterThan(worse.breakdown.price);
-    expect(better.breakdown.hours).toBeGreaterThan(worse.breakdown.hours);
-    expect(better.breakdown.year).toBeGreaterThan(worse.breakdown.year);
-    expect(better.breakdown.location).toBeGreaterThan(worse.breakdown.location);
+    expect(better.breakdown?.price ?? 0).toBeGreaterThan(worse.breakdown?.price ?? 0);
+    expect(better.breakdown?.hours ?? 0).toBeGreaterThan(worse.breakdown?.hours ?? 0);
+    expect(better.breakdown?.year ?? 0).toBeGreaterThan(worse.breakdown?.year ?? 0);
+    expect(better.breakdown?.location ?? 0).toBeGreaterThan(worse.breakdown?.location ?? 0);
   });
 
   it("reduces confidence with missing data", () => {
@@ -52,6 +52,6 @@ describe("scoring engine", () => {
       defaultScoringConfig
     );
     expect(score.confidence).toBeLessThan(1);
-    expect(score.breakdown.completeness).toBeLessThan(100);
+    expect(score.breakdown?.completeness ?? 0).toBeLessThan(100);
   });
 });
