@@ -32,6 +32,16 @@ type SellerListing = {
   source: "manual" | "csv";
 };
 
+type DemoListingLike = {
+  id?: string;
+  title?: string;
+  state?: string;
+  category?: string;
+  price?: number;
+  hours?: number;
+};
+
+
 type DemoTourState = {
   ndaAccepted: boolean;
   contactEmailDraft: { subject: string; body: string };
@@ -582,7 +592,8 @@ const TourStepContent = ({
 
 const TourListingDetail = ({ selectedListingId }: { selectedListingId: string | null }) => {
   const listing =
-    demoListings.find((item) => item.id === selectedListingId) ?? demoListings[0];
+    (demoListings as DemoListingLike[]).find((item: DemoListingLike) => item.id === selectedListingId) ??
+    (demoListings as DemoListingLike[])[0];
 
   if (!listing?.id) {
     return (
@@ -883,7 +894,7 @@ const TourSellerListings = () => {
               <p className="text-xs uppercase tracking-wide text-slate-400">
                 {listing.source === "manual" ? "Manual entry" : "CSV import"}
               </p>
-              <h3 className="mt-2 text-lg font-semibold">{listing.title}</h3>
+              <h3 className="mt-2 text-lg font-semibold">{listing.title ?? "Untitled listing"}</h3>
               <p className="text-sm text-slate-300">{listing.category}</p>
               <div className="mt-3 text-xs text-slate-300">
                 <span>Price: {listing.price || "—"}</span>
@@ -1069,13 +1080,14 @@ const TourEnterpriseScoring = () => {
     setEnterprisePreferredState,
   } = useDemoTour();
   const states = useMemo(
-    () => Array.from(new Set(demoListings.map((listing) => listing.state))).sort(),
+    () =>
+      Array.from(new Set((demoListings as DemoListingLike[]).map((listing: DemoListingLike) => listing.state ?? ""))).sort(),
     []
   );
 
   const ranked = useMemo(() => {
-    const prices = demoListings.map((listing) => listing.price);
-    const hours = demoListings.map((listing) => listing.hours);
+    const prices = (demoListings as DemoListingLike[]).map((listing: DemoListingLike) => listing.price ?? 0);
+    const hours = (demoListings as DemoListingLike[]).map((listing: DemoListingLike) => listing.hours ?? 0);
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     const minHours = Math.min(...hours);
@@ -1085,14 +1097,14 @@ const TourEnterpriseScoring = () => {
       1
     );
 
-    return demoListings
-      .map((listing) => {
-        const priceScore = 1 - normalizeValue(listing.price, minPrice, maxPrice);
-        const hoursScore = 1 - normalizeValue(listing.hours, minHours, maxHours);
+    return (demoListings as DemoListingLike[])
+      .map((listing: DemoListingLike) => {
+        const priceScore = 1 - normalizeValue(listing.price ?? 0, minPrice, maxPrice);
+        const hoursScore = 1 - normalizeValue(listing.hours ?? 0, minHours, maxHours);
         const locationScore =
           enterprisePreferredState === "Any"
             ? 0.5
-            : listing.state === enterprisePreferredState
+            : (listing.state ?? "") === enterprisePreferredState
             ? 1
             : 0.1;
         const score =
@@ -1103,8 +1115,8 @@ const TourEnterpriseScoring = () => {
         return { listing, score };
       })
       .sort(
-        (a, b) =>
-          b.score - a.score || a.listing.id.localeCompare(b.listing.id)
+        (a: { listing: DemoListingLike; score: number }, b: { listing: DemoListingLike; score: number }) =>
+          b.score - a.score || (a.listing.id ?? "").localeCompare(b.listing.id ?? "")
       );
   }, [enterprisePreferredState, enterpriseWeights]);
 
@@ -1168,20 +1180,20 @@ const TourEnterpriseScoring = () => {
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <h3 className="text-lg font-semibold">Ranked demo listings</h3>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {ranked.map(({ listing, score }, index) => (
+          {ranked.map(({ listing, score }: { listing: DemoListingLike; score: number }, index: number) => (
             <div
-              key={listing.id}
+              key={listing.id ?? `ranked-${index}`} 
               className="rounded-2xl border border-white/10 bg-slate-900/60 p-4"
             >
               <p className="text-xs uppercase tracking-wide text-slate-400">
                 Rank {index + 1}
               </p>
-              <h4 className="mt-2 text-sm font-semibold">{listing.title}</h4>
-              <p className="text-xs text-slate-300">{listing.state} • {listing.category}</p>
+              <h4 className="mt-2 text-sm font-semibold">{listing.title ?? "Untitled listing"}</h4>
+              <p className="text-xs text-slate-300">{listing.state ?? "—"} • {listing.category ?? "—"}</p>
               <div className="mt-3 text-xs text-slate-300">
-                <span>Price: ${listing.price.toLocaleString()}</span>
+                <span>Price: {typeof listing.price === "number" ? `$${listing.price.toLocaleString()}` : "—"}</span>
                 <span className="mx-2">•</span>
-                <span>Hours: {listing.hours.toLocaleString()}</span>
+                <span>Hours: {typeof listing.hours === "number" ? listing.hours.toLocaleString() : "—"}</span>
               </div>
               <p className="mt-3 text-xs text-emerald-200">
                 Composite score: {(score * 100).toFixed(1)}

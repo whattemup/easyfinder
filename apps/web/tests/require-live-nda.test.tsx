@@ -10,7 +10,7 @@ const AUTH_SESSION_STORAGE_KEY = "easyfinder_auth_session";
 
 const renderGuard = async (
   initialEntries: string[],
-  RequireLiveNda: React.ComponentType,
+  RequireLiveNda: React.ComponentType<{ fetchNdaStatus?: () => Promise<{ accepted: boolean }> }>,
   fetchNdaStatus: () => Promise<{ accepted: boolean }>
 ) => {
   return render(

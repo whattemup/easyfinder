@@ -47,6 +47,7 @@ export const ScoringConfigs = () => {
   });
 
   const config = draftConfig ?? defaultScoringConfig;
+  const weights = (config.weights ?? {}) as Partial<Record<keyof ScoringConfig["weights"], number>>;
   const enterprise = isEnterpriseUser(user?.role);
 
   const sampleListing = demoListings[0];
@@ -55,13 +56,13 @@ export const ScoringConfigs = () => {
     [config, sampleListing]
   );
 
-  const totalWeight = Object.values(config.weights).reduce(
-    (sum, value) => sum + value,
-    0
-  );
+  const totalWeight = Object.values(weights).reduce((sum: number, value: number | undefined) => sum + (value ?? 0), 0);
+
+  const confidence = sampleScore.confidence ?? 0;
+  const reasons = sampleScore.reasons ?? [];
 
   const handleWeightChange = (key: keyof ScoringConfig["weights"], value: number) => {
-    setDraftConfig((prev) =>
+    setDraftConfig((prev: ScoringConfig | null) =>
       prev
         ? {
             ...prev,
@@ -90,7 +91,7 @@ export const ScoringConfigs = () => {
         <div className="grid gap-4 md:grid-cols-2">
           {Object.entries(weightLabels).map(([key, label]) => {
             const weightKey = key as keyof ScoringConfig["weights"];
-            const value = config.weights[weightKey] ?? 0;
+            const value = weights[weightKey] ?? 0;
             return (
               <div key={key} className="space-y-2">
                 <div className="flex items-center justify-between text-sm text-slate-300">
@@ -141,14 +142,14 @@ export const ScoringConfigs = () => {
           <div className="flex items-center justify-between text-sm text-slate-300">
             <span>Confidence</span>
             <span title="Confidence reflects data completeness.">
-              {(sampleScore.confidence * 100).toFixed(0)}%
+              {(confidence * 100).toFixed(0)}%
             </span>
           </div>
           <ul className="space-y-2 text-sm text-slate-300">
-            {Object.entries(sampleScore.breakdown).map(([key, value]) => (
+            {Object.entries(sampleScore.breakdown ?? {}).map(([key, value]) => (
               <li key={key} className="flex items-center justify-between">
                 <span className="capitalize">{key}</span>
-                <span>{value}</span>
+                <span>{String(value)}</span>
               </li>
             ))}
           </ul>
@@ -157,7 +158,7 @@ export const ScoringConfigs = () => {
         <Card className="space-y-3">
           <h3 className="text-lg font-semibold">Why this score</h3>
           <ul className="list-disc space-y-2 pl-5 text-sm text-slate-300">
-            {sampleScore.reasons.map((reason) => (
+            {reasons.map((reason: string) => (
               <li key={reason}>{reason}</li>
             ))}
           </ul>
