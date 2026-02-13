@@ -1,125 +1,89 @@
-**🚜EasyFinder**
-**Intelligent Equipment Discovery & Scoring Platform**
+# 🚜 EasyFinder
 
-_Find the best heavy equipment — faster, smarter, and without middlemen._
+## Intelligent Equipment Discovery & Scoring Platform
 
-**🌍** **What Is EasyFinder?**
+*Find the best heavy equipment — faster, smarter, and without middlemen.*
+
+## 🌍 What Is EasyFinder?
 
 EasyFinder is a full-stack platform designed to help buyers and sellers of heavy-duty equipment (construction, industrial, agricultural) connect efficiently.
 
 Instead of bouncing between dealers, auctions, and third-party marketplaces, EasyFinder provides a single destination where:
 
-Buyers instantly discover the best equipment for their budget
+- Buyers instantly discover the best equipment for their budget.
+- Sellers list equipment and reach serious buyers faster.
+- The platform intelligently scores and ranks listings.
+- Every recommendation is explainable, transparent, and data-driven.
 
-Sellers list equipment and reach serious buyers faster
+## 🎯 Core Value Proposition
 
-The platform intelligently scores and ranks listings
+### For Buyers
 
-Every recommendation is explainable, transparent, and data-driven
+- One place to search across inventory.
+- Instant ranking of best options.
+- Price vs condition vs usage scored automatically.
+- No dealer pressure or auction friction.
 
-**🎯 Core Value Proposition**
+### For Sellers
 
-**For Buyers**
+- Faster exposure to qualified buyers.
+- Intelligent positioning of listings.
+- Reduced time-to-sale.
 
-One place to search across inventory
+### For the Platform
 
-Instant ranking of best options
+- Commission-based transaction model.
+- High-value equipment → meaningful margins.
+- Scalable intelligence layer.
 
-Price vs condition vs usage scored automatically
+## 🧠 What Makes EasyFinder Different?
 
-No dealer pressure or auction friction
-
-**For Sellers**
-
-Faster exposure to qualified buyers
-
-Intelligent positioning of listings
-
-Reduced time-to-sale
-
-**For the Platform**
-
-Commission-based transaction model
-
-High-value equipment → meaningful margins
-
-Scalable intelligence layer
-
-**🧠 What Makes EasyFinder Different?**
-
-✔ Scoring, not sorting
-✔ Explainable rankings
-✔ Config-driven intelligence
-✔ Built for scale, not MVP hacks
+- ✔ Scoring, not sorting.
+- ✔ Explainable rankings.
+- ✔ Config-driven intelligence.
+- ✔ Built for scale, not MVP hacks.
 
 EasyFinder doesn’t just list equipment — it tells you what’s worth buying and why.
 
+## 🏗️ System Architecture (High Level)
 
-**🏗️ System Architecture (High Level**)
-
-**User Browser**
-
+```text
+User Browser
      │
      ▼
-**Frontend (Vercel / Vite + React)**
-
+Frontend (Vercel / Vite + React)
      │
      ▼
-**Backend API (Fly.io / Fastify)**
-
+Backend API (Fly.io / Fastify)
      │
      ▼
-**Scoring Engine + Database (MongoDB)**
+Scoring Engine + Database (MongoDB)
+```
 
+## 📁 Repository Structure
 
-
-**📁 Repository Structure**
-
-**easyfinder/**
-
-**├── apps/**
-
-**│   ├── api/                # Backend API (Fastify + TypeScript)**
-
-**│   │   ├── src/**
-
-**│   │   │   ├── routes/     # API endpoints**
-
-**│   │   │   ├── scoring/    # Scoring engine**
-
-**│   │   │   ├── services/  # Business logic**
-
-**│   │   │   ├── plugins/   # Fastify plugins (JWT, auth)**
-
-**│   │   │   └── index.ts   # API entry point**
-
-**│   │   └── tests/**
-
-**│   │**
-
-**│   └── web/                # Frontend (Vite + React)**
-
-**│       ├── src/**
-
-**│       └── dist/**
-
-**│**
-
-**├── packages/**
-
-**│   └── shared/             # Shared types & utilities**
-
-**│**
-
-**├── .github/workflows/      # CI pipelines**
-
-**├── Dockerfile              # API container**
-
-**├── fly.toml                # Fly.io config**
-
-**├── pnpm-workspace.yaml**
-
-**└── README.md**
+```text
+easyfinder/
+├── apps/
+│   ├── api/                # Backend API (Fastify + TypeScript)
+│   │   ├── src/
+│   │   │   ├── routes/     # API endpoints
+│   │   │   ├── scoring/    # Scoring engine
+│   │   │   ├── services/   # Business logic
+│   │   │   ├── plugins/    # Fastify plugins (JWT, auth)
+│   │   │   └── index.ts    # API entry point
+│   │   └── tests/
+│   └── web/                # Frontend (Vite + React)
+│       ├── src/
+│       └── dist/
+├── packages/
+│   └── shared/             # Shared types & utilities
+├── .github/workflows/      # CI pipelines
+├── Dockerfile              # API container
+├── fly.toml                # Fly.io config
+├── pnpm-workspace.yaml
+└── README.md
+```
 
 ## Local development (Windows / PowerShell)
 
@@ -138,9 +102,10 @@ Copy-Item apps/web/.env.example apps/web/.env
 ```
 
 Notes:
-- Copy  pps/api/.env.example to  pps/api/.env for local development, then fill in your local values (JWT_SECRET, MONGO_URL, DB_NAME).
--  pps/web/.env should set VITE_API_BASE_URL (recommended: http://127.0.0.1:8080).
-- **Never commit .env files.** Use .env.example templates and keep real secrets in your platform secret manager.
+
+- Copy `apps/api/.env.example` to `apps/api/.env` for local development, then fill in your local values (`JWT_SECRET`, `MONGO_URL`, `DB_NAME`).
+- `apps/web/.env` should set `VITE_API_BASE_URL` (recommended: `http://127.0.0.1:8080`).
+- **Never commit `.env` files.** Use `.env.example` templates and keep real secrets in your platform secret manager.
 
 ### Clean install + build
 
@@ -172,144 +137,111 @@ pnpm --filter @easyfinderai/web dev
 
 Vercel note: set `VITE_API_BASE_URL` as the host-only API origin (e.g. `https://easyfinder.fly.dev`) without `/api`.
 
+## ⚙️ Tech Stack
 
-**⚙️ Tech Stack**
+### Backend
 
-Backend
+- Node.js
+- Fastify
+- TypeScript
+- JWT Authentication
+- MongoDB
+- Docker
+- Fly.io
 
-Node.js
+### Frontend
 
-Fastify
+- React
+- Vite
+- TypeScript
+- Vercel
 
-TypeScript
+### Tooling
 
-JWT Authentication
+- pnpm workspaces
+- ESLint
+- TypeScript strict mode
+- GitHub Actions (CI)
 
-MongoDB
+## 🔌 Live Endpoints (Current)
 
-Docker
+### Health
 
-Fly.io
+- **GET** `/api/health`
+- ✔ API up
+- ✔ Database connected
 
-Frontend
+### Listings (Core Feature)
 
-React
-
-Vite
-
-TypeScript
-
-Vercel
-
-Tooling
-
-pnpm workspaces
-
-ESLint
-
-TypeScript strict mode
-
-GitHub Actions (CI)
-
-
-
-**🔌 Live Endpoints (Current)**
-+
-+
-**Health**
-**GET** /api/health
-**✔ API up**
-**✔ Database connected**
-+
-+
-+
-Listings (Core Feature)
-GET /api/listings
-
+- **GET** `/api/listings`
 
 Returns:
 
-Equipment listings
+- Equipment listings
+- Total score
+- Score breakdown
+- Human-readable rationale
 
-Total score
+### Scoring Configuration
 
-Score breakdown
-
-Human-readable rationale
-
-Scoring Configuration
-GET /api/scoring-configs
-
+- **GET** `/api/scoring-configs`
 
 Shows:
 
-Active weights
+- Active weights
+- Preferred states
+- Price & hour thresholds
 
-Preferred states
+### Watchlist
 
-Price & hour thresholds
-
-Watchlist
-GET /api/watchlist
-
+- **GET** `/api/watchlist`
 
 (Currently stubbed for future expansion)
 
-🧮 Scoring Engine
+## 🧮 Scoring Engine
 
 The scoring engine is the heart of EasyFinder.
 
-What It Does
+### What It Does
 
-Evaluates each listing
+- Evaluates each listing.
+- Applies configurable weights.
+- Produces:
+  - `totalScore`
+  - Component scores
+  - Clear explanations
 
-Applies configurable weights
+### Why It Matters
 
-Produces:
+- No black boxes.
+- Buyers understand recommendations.
+- Admins can tune behavior without redeploying code.
 
-totalScore
-
-Component scores
-
-Clear explanations
-
-Why It Matters
-
-No black boxes
-
-Buyers understand recommendations
-
-Admins can tune behavior without redeploying code
-
-🔐 Authentication (Planned, Partially Wired)
+## 🔐 Authentication (Planned, Partially Wired)
 
 Role system exists:
 
-demo
-
-buyer
-
-seller
-
-admin
+- `demo`
+- `buyer`
+- `seller`
+- `admin`
 
 JWT infrastructure is in place.
 Routes will be enabled after product vision is finalized.
 
-🚀 Deployment
-Backend (Fly.io)
+## 🚀 Deployment
 
-Dockerized
+### Backend (Fly.io)
 
-Internal port: 8080
-
-HTTPS via Fly proxy
+- Dockerized
+- Internal port: 8080
+- HTTPS via Fly proxy
 
 ## 🔐 Environment Variables
 
 EasyFinder uses environment variables for configuration.
 
-**Never commit real secrets** to the repository.  
+**Never commit real secrets** to the repository.
 Use `.env` files locally and **Fly/Vercel secrets** in production.
 
 ### Backend (Fly.io / `apps/api`)
@@ -332,95 +264,74 @@ fly secrets set \
   DB_NAME="easyfinder" \
   JWT_SECRET="..." \
   CORS_ORIGINS="https://easyfinderai.vercel.app"
+```
 
+### Frontend (Vercel)
 
-**Frontend (Vercel)**
+- Root directory: `apps/web`
+- Build output: `dist`
+- Variable: `VITE_API_BASE_URL`
+- Description: API base URL (host-only, no `/api`)
+- Example: `https://easyfinder.fly.dev`
 
-Root directory: apps/web
-
-Build output: dist
-
-Variable: VITE_API_BASE_URL
-
-Description: API base URL (host-only, no `/api`)
-
-Example: https://easyfinder.fly.dev
-		
-
-
-**🧪 CI / Quality Gates**
+## 🧪 CI / Quality Gates
 
 CI runs on every PR and main branch push.
 
 Checks include:
 
-Linting
-
-Type checking
-
-Build validation
+- Linting
+- Type checking
+- Build validation
 
 The goal: keep the codebase clean and predictable.
 
-**📌 Current Project Status**
+## 📌 Current Project Status
 
-**✅ Backend live**
-**✅ Frontend live**
-**✅ Scoring engine operational**
-**✅ CI configured**
-**⚠️ Auth & transactions intentionally deferred**
+- ✅ Backend live
+- ✅ Frontend live
+- ✅ Scoring engine operational
+- ✅ CI configured
+- ⚠️ Auth & transactions intentionally deferred
 
 This is a stable foundation, not a prototype.
 
-🛣️ Roadmap (High Level)
+## 🛣️ Roadmap (High Level)
 
-Phase 1 — Vision Lock
+### Phase 1 — Vision Lock
 
-Finalize buyer/seller flows
+- Finalize buyer/seller flows
+- Define commission model
+- Lock scoring philosophy
 
-Define commission model
+### Phase 2 — Core Expansion
 
-Lock scoring philosophy
+- Seller onboarding
+- Auth flows
+- Admin dashboards
 
-Phase 2 — Core Expansion
+### Phase 3 — Intelligence
 
-Seller onboarding
+- Smarter scoring
+- Market trend analysis
+- Deal recommendations
 
-Auth flows
+## 📄 Documentation Index
 
-Admin dashboards
+- `README.md` → This file
+- `PRODUCT_VISION.md` → Product direction & goals
+- `SYSTEM_OVERVIEW.md` → Architecture & internals
+- (Planned) `SCORING_MODEL.md`
+- (Planned) `API_REFERENCE.md`
 
-Phase 3 — Intelligence
+## 🤝 Contribution Philosophy
 
-Smarter scoring
+- Clean code > fast hacks
+- Explainability > cleverness
+- Architecture before scale
+- No noise, no bloat
 
-Market trend analysis
-
-Deal recommendations
-
-📄 Documentation Index
-
-README.md → This file
-
-PRODUCT_VISION.md → Product direction & goals
-
-SYSTEM_OVERVIEW.md → Architecture & internals
-
-(Planned) SCORING_MODEL.md
-
-(Planned) API_REFERENCE.md
-
-🤝 Contribution Philosophy
-
-Clean code > fast hacks
-
-Explainability > cleverness
-
-Architecture before scale
-
-No noise, no bloat
-
-🧠 Final Note
+## 🧠 Final Note
 
 EasyFinder is built to become the intelligent layer between buyers, sellers, and the heavy-equipment market.
 
