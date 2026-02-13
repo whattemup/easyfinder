@@ -1,13 +1,27 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { listings } from "../store.js";
 import { fail, ok } from "../response.js";
 import { requireNDA } from "../middleware/requireNDA.js";
 
 const sellerOnly = new Set(["seller", "admin"]);
 
+const requireAuthenticatedUserId = (request: FastifyRequest, reply: FastifyReply) => {
+  const userId = request.user?.id;
+  if (!userId) {
+    fail(request, reply, "UNAUTHORIZED", "Authentication required.", 401);
+    return null;
+  }
+  return userId;
+};
+
 export default async function sellerRoutes(app: FastifyInstance) {
   app.get("/insights", { preHandler: [app.authenticate, requireNDA] }, async (request, reply) => {
-    if (!sellerOnly.has(request.user.role)) {
+    const userId = requireAuthenticatedUserId(request, reply);
+    if (!userId) {
+      return;
+    }
+    const userRole = request.user?.role;
+    if (!userRole || !sellerOnly.has(userRole)) {
       return fail(request, reply, "FORBIDDEN", "Seller access only.", 403);
     }
 
