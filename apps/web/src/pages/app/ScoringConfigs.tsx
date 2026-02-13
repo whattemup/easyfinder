@@ -80,7 +80,7 @@ export const ScoringConfigs = () => {
   const confidence = sampleScore.confidence ?? 0;
   const reasons = sampleScore.reasons ?? [];
 
-  const handleWeightChange = (key: keyof ScoringConfig["weights"], value: number) => {
+  const handleWeightChange = (key: string, value: number) => {
     setDraftConfig((prev: ScoringConfig | null) =>
       prev
         ? {
@@ -108,13 +108,13 @@ export const ScoringConfigs = () => {
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          {Object.entries(weightLabels).map(([key, label]) => {
-            const weightKey = key as keyof ScoringConfig["weights"];
-            const value = weights[weightKey] ?? 0;
+          {(Object.keys(weightLabels) as Array<keyof typeof weightLabels>).map((weightKey) => {
+            const label: string = weightLabels[weightKey];
+            const value = weights[String(weightKey)] ?? 0;
             return (
-              <div key={key} className="space-y-2">
+              <div key={String(weightKey)} className="space-y-2">
                 <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>{label}</span>
+                  <span>{String(label)}</span>
                   <span>{(value * 100).toFixed(0)}%</span>
                 </div>
                 <input
@@ -123,7 +123,7 @@ export const ScoringConfigs = () => {
                   max={100}
                   step={5}
                   value={Math.round(value * 100)}
-                  onChange={(event) => handleWeightChange(weightKey, Number(event.target.value))}
+                  onChange={(event) => handleWeightChange(String(weightKey), Number(event.target.value))}
                   disabled={!enterprise}
                   className="w-full accent-amber-400"
                 />
