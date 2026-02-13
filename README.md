@@ -138,8 +138,9 @@ Copy-Item apps/web/.env.example apps/web/.env
 ```
 
 Notes:
-- `apps/api/.env` is required (see `JWT_SECRET`, `MONGO_URL`, `DB_NAME`).
-- `apps/web/.env` should set `VITE_API_BASE_URL` (recommended: `http://127.0.0.1:8080`).
+- Copy  pps/api/.env.example to  pps/api/.env for local development, then fill in your local values (JWT_SECRET, MONGO_URL, DB_NAME).
+-  pps/web/.env should set VITE_API_BASE_URL (recommended: http://127.0.0.1:8080).
+- **Never commit .env files.** Use .env.example templates and keep real secrets in your platform secret manager.
 
 ### Clean install + build
 
