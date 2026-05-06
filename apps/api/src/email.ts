@@ -44,3 +44,23 @@ export const sendOfferStatusEmail = async (args: {
     `,
   });
 };
+
+export const sendInquiryNotificationEmail = async (args: {
+  to: string;
+  buyerName: string;
+  buyerEmail: string;
+  listingTitle: string;
+  message: string;
+}) => {
+  if (!resend || !env.RESEND_FROM) return;
+  await resend.emails.send({
+    from: env.RESEND_FROM,
+    to: args.to,
+    subject: `New inquiry on: ${args.listingTitle}`,
+    html: `
+      <p><strong>${args.buyerName}</strong> (${args.buyerEmail}) sent an inquiry about <strong>${args.listingTitle}</strong>:</p>
+      <blockquote>${args.message}</blockquote>
+      <p>Log in to EasyFinder to respond.</p>
+    `,
+  });
+};

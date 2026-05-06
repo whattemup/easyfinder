@@ -682,3 +682,49 @@ export const getAdminAuditLogs = (params: { event?: string; userId?: string; res
   const query = search.toString();
   return apiRequest<AdminAuditResponse>(`/admin/audit${query ? `?${query}` : ""}`);
 };
+
+export type DealInput = {
+  listing_id: string;
+  asking_price: number;
+  category?: string;
+  hours?: number;
+  condition?: string;
+  operable?: boolean;
+  distance_miles?: number;
+  is_auction?: boolean;
+  market_p50?: number;
+  market_p90?: number;
+};
+
+export type DealResult = {
+  decision: "BUY" | "NEGOTIATE" | "WALK";
+  asking_price: number;
+  fair_value: number;
+  roi_at_ask: number;
+  final_offer: number | null;
+  final_roi: number | null;
+  confidence: number;
+  costs: {
+    asking_price: number;
+    auction_premium: number;
+    transport_cost: number;
+    repair_estimate: number;
+    wear_penalty: number;
+    total_acquisition: number;
+  };
+  negotiation: Array<{
+    round_number: number;
+    counter_price: number;
+    achieved_roi: number;
+    accept: boolean;
+  }>;
+  rationale: string[];
+  flags: string[];
+  version: string;
+};
+
+export const evaluateDeal = (input: DealInput) =>
+  apiRequest<DealResult>("/deal/evaluate", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });

@@ -63,6 +63,7 @@ const ageInDays = (iso?: string) => {
 export function scoreListingV2(listing: Listing, config: ScoringConfig): ScoreBreakdown {
   const operableFlag = listing.is_operable !== undefined ? listing.is_operable : listing.operable;
   const flags: string[] = [];
+
   if (operableFlag === false) {
     flags.push("NON_OPERABLE", "NOT_BEST_OPTION_ELIGIBLE");
     return {
@@ -225,46 +226,22 @@ export function scoreListingV2(listing: Listing, config: ScoringConfig): ScoreBr
   speed = clamp(Math.round(speed), 0, 100);
 
   let confidenceScore = 100;
-  if (!Number.isFinite(price)) {
-    confidenceScore -= 20;
-  }
-  if (!Number.isFinite(hours)) {
-    confidenceScore -= 20;
-  }
-  if (!listing.state) {
-    confidenceScore -= 12;
-    flags.push("MISSING_STATE");
-  }
-  if (!listing.description?.trim()) {
-    confidenceScore -= 8;
-  }
-  if (!Number.isFinite(photos ?? Number.NaN)) {
-    confidenceScore -= 8;
-  } else if ((photos ?? 0) < 5) {
-    confidenceScore -= 8;
-  }
-  if (!listing.verifiedSeller) {
-    confidenceScore -= 8;
-  }
-  if (!listing.source || listing.source === "unknown") {
-    confidenceScore -= 6;
-  }
-  if (typeof staleDays === "number" && staleDays > 14) {
-    confidenceScore -= 10;
-  }
-
+  if (!Number.isFinite(price)) confidenceScore -= 20;
+  if (!Number.isFinite(hours)) confidenceScore -= 20;
+  if (!listing.state) { confidenceScore -= 12; flags.push("MISSING_STATE"); }
+  if (!listing.description?.trim()) confidenceScore -= 8;
+  if (!Number.isFinite(photos ?? Number.NaN)) confidenceScore -= 8;
+  else if ((photos ?? 0) < 5) confidenceScore -= 8;
+  if (!listing.verifiedSeller) confidenceScore -= 8;
+  if (!listing.source || listing.source === "unknown") confidenceScore -= 6;
+  if (typeof staleDays === "number" && staleDays > 14) confidenceScore -= 10;
   confidenceScore = clamp(Math.round(confidenceScore), 0, 100);
 
   const total = clamp(Math.round(deal * 0.25 + usage * 0.25 + risk * 0.25 + speed * 0.25), 0, 100);
   const bestOptionEligible = !flags.includes("NON_OPERABLE") && confidenceScore >= 60 && risk >= 40;
 
-  if (confidenceScore < 60) {
-    flags.push("LOW_CONFIDENCE");
-  }
-
-  if (!bestOptionEligible) {
-    flags.push("NOT_BEST_OPTION_ELIGIBLE");
-  }
+  if (confidenceScore < 60) flags.push("LOW_CONFIDENCE");
+  if (!bestOptionEligible) flags.push("NOT_BEST_OPTION_ELIGIBLE");
 
   const reasons = [
     dealReasons[0],

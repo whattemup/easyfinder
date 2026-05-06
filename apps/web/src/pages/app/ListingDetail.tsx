@@ -12,6 +12,8 @@ import {
   getListing,
   getRequestId,
   getWatchlist,
+  evaluateDeal,
+  DealResult,
 } from "../../lib/api";
 import { WatchlistItem } from "@easyfinderai/shared";
 import { useAuth } from "../../lib/auth";
@@ -33,6 +35,9 @@ export const ListingDetail = () => {
   const [inquirySuccess, setInquirySuccess] = useState(false);
   const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [deal, setDeal] = useState<DealResult | null>(null);
+  const [dealLoading, setDealLoading] = useState(false);
+  const [dealError, setDealError] = useState<string | null>(null);
 
   const listingQuery = useQuery({
     queryKey: ["listing", id],
@@ -113,6 +118,26 @@ export const ListingDetail = () => {
   const canRequestInfo =
     !runtime.demoMode && (user?.role === "buyer" || user?.role === "admin");
 
+  const handleDealAnalysis = async () => {
+    if (!data) return;
+    setDealLoading(true);
+    setDealError(null);
+    try {
+      const result = await evaluateDeal({
+        listing_id:   data.id,
+        asking_price: data.price ?? 0,
+        category:     (data as any).category ?? "equipment",
+        hours:        data.hours ?? undefined,
+        operable:     data.operable !== false && (data as any).is_operable !== false,
+      });
+      setDeal(result);
+    } catch (e: any) {
+      setDealError(e.message ?? "Deal analysis failed.");
+    } finally {
+      setDealLoading(false);
+    }
+  };
+
   const handleSubmitInquiry = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!id || !inquiryMessage.trim()) return;
@@ -150,9 +175,14 @@ export const ListingDetail = () => {
                   Request sent
                 </Button>
               ) : (
+                <>
                 <Button variant="secondary" onClick={() => setIsRequestModalOpen(true)}>
                   Request Info
                 </Button>
+                <Button variant="outline" onClick={handleDealAnalysis} disabled={dealLoading}>
+                  {dealLoading ? "Analyzing…" : "Run Deal Analysis"}
+                </Button>
+                </>
               ))}
             <Badge
               className="bg-accent text-slate-900"
@@ -265,6 +295,34 @@ export const ListingDetail = () => {
           ))}
         </ul>
       </aside>
+
+      {dealError && (
+        <div className="mt-4 rounded border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-200">{dealError}</div>
+      )}
+
+      {deal && (
+        <div className="mt-4 space-y-4 rounded-lg border border-slate-700 bg-slate-900 p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Deal Analysis</h3>
+            <span className={`rounded-md px-3 py-1 text-sm font-bold ${{ BUY: "bg-green-500/20 text-green-300 border border-green-500/40", NEGOTIATE: "bg-yellow-500/20 text-yellow-300 border border-yellow-500/40", WALK: "bg-rose-500/20 text-rose-300 border border-rose-500/40" }[deal.decision]}`}>{deal.decision}</span>
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center text-xs">
+            <div className="rounded-lg bg-slate-800 p-3"><div className="text-slate-400 mb-1">Fair Value</div><div className="font-semibold">${Math.round(deal.fair_value).toLocaleString()}</div></div>
+            <div className="rounded-lg bg-slate-800 p-3"><div className="text-slate-400 mb-1">ROI at Ask</div><div className="font-semibold">{(deal.roi_at_ask*100).toFixed(1)}%</div></div>
+            <div className="rounded-lg bg-slate-800 p-3"><div className="text-slate-400 mb-1">Confidence</div><div className="font-semibold">{(deal.confidence*100).toFixed(0)}%</div></div>
+          </div>
+          <div className="space-y-1 text-xs text-slate-300">
+            <div className="flex justify-between"><span>Asking</span><span>${deal.costs.asking_price.toLocaleString()}</span></div>
+            {deal.costs.transport_cost > 0 && <div className="flex justify-between"><span>Transport</span><span>${Math.round(deal.costs.transport_cost).toLocaleString()}</span></div>}
+            <div className="flex justify-between"><span>Repair est.</span><span>${Math.round(deal.costs.repair_estimate).toLocaleString()}</span></div>
+            {deal.costs.wear_penalty > 0 && <div className="flex justify-between"><span>Wear penalty</span><span>${Math.round(deal.costs.wear_penalty).toLocaleString()}</span></div>}
+            <div className="flex justify-between border-t border-slate-700 pt-1 font-semibold text-white"><span>Total acquisition</span><span>${Math.round(deal.costs.total_acquisition).toLocaleString()}</span></div>
+          </div>
+          {deal.negotiation.length > 0 && <div className="space-y-1 text-xs text-slate-300">{deal.negotiation.map(r => <div key={r.round_number} className="flex justify-between"><span>Round {r.round_number}: ${r.counter_price.toLocaleString()}</span><span className={r.accept ? "text-green-400" : "text-slate-500"}>{r.accept ? "✓ accept" : "✗ reject"}</span></div>)}</div>}
+          {deal.flags.length > 0 && <div className="flex flex-wrap gap-2">{deal.flags.map(f => <span key={f} className="rounded bg-rose-500/20 px-2 py-0.5 text-xs text-rose-300 border border-rose-500/30">{f}</span>)}</div>}
+          <ul className="space-y-1 text-xs text-slate-300">{deal.rationale.map((r,i) => <li key={i} className="flex gap-2"><span className="text-accent">→</span>{r}</li>)}</ul>
+        </div>
+      )}
 
       {isRequestModalOpen && canRequestInfo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">

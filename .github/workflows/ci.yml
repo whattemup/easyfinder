@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [app]
+    branches: [app, main]
   pull_request:
 
 jobs:
@@ -69,3 +69,18 @@ jobs:
 
       - name: Build
         run: pnpm -w build
+
+  deploy:
+    name: Deploy to Fly.io
+    needs: build-typecheck
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

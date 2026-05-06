@@ -39,3 +39,4 @@ apps/web/.env.local
 
 # Dependencies
 **/node_modules/
+apps/api/.e

@@ -24,6 +24,7 @@ const FREE_BUYER_LISTING_LIMIT = 25;
 export const Listings = () => {
   const { token, user } = useAuth();
   const runtime = useRuntime();
+  const [search, setSearch] = useState("");
   const [state, setState] = useState("");
   const [maxHours, setMaxHours] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -126,14 +127,24 @@ export const Listings = () => {
     listing.source?.startsWith("seller:")
   ).length;
   const visibleExternalCount = visibleListings.length - visibleSellerCount;
-  const filteredListings = sellerOnly
-    ? visibleListings.filter((listing) => listing.source?.startsWith("seller:"))
+  const searchFiltered = search.trim()
+    ? visibleListings.filter((l) => `${l.title} ${l.description ?? ""}`.toLowerCase().includes(search.toLowerCase()))
     : visibleListings;
+  const filteredListings = sellerOnly
+    ? searchFiltered.filter((listing) => listing.source?.startsWith("seller:"))
+    : searchFiltered;
   const hasInvalidData = data !== undefined && !Array.isArray(data);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
+        <Input
+          type="text"
+          placeholder="Search equipment..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-48"
+        />
         <select
           className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm"
           value={state}

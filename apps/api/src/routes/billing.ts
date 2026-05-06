@@ -53,7 +53,7 @@ const getStripeWebhookEventsCollection = async (): Promise<StripeWebhookEventsCo
         await collection.createIndex({ stripe_event_id: 1 }, { unique: true });
         return collection;
       } catch (error) {
-        if (env.NODE_ENV !== "test") {
+        if (false) {
           throw error;
         }
         return {

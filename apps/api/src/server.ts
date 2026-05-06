@@ -27,6 +27,10 @@ import { ZodError } from "zod";
 import { env } from "./env.js";
 import meRoutes from "./routes/me.js";
 import ironPlanetScraperRoutes from "./routes/scrapers.ironplanet.js";
+import dealRoutes from "./routes/deal.js";
+import emailRoutes from "./routes/emails.js";
+import brokerRoutes from "./routes/broker.js";
+import intelligenceRoutes from "./routes/intelligence.js";
 
 const normalizeRole = (role: unknown): UserRole => {
   if (
@@ -229,6 +233,7 @@ export const buildServer = () => {
   app.register(scoringRoutes, { prefix: "/api/scoring-configs" });
   app.register(watchlistRoutes, { prefix: "/api/watchlist" });
   app.register(offersRoutes, { prefix: "/api/offers" });
+  app.register(emailRoutes, { prefix: "/api/emails" });
   app.register(inquiriesRoutes, { prefix: "/api/inquiries" });
   app.register(authRoutes, { prefix: "/api/auth" });
   if (env.ADMIN_ENABLED) {
@@ -249,6 +254,9 @@ export const buildServer = () => {
   app.register(ndaRoutes, { prefix: "/api/nda" });
   // Always mount billing routes so promo activation is available in all environments.
   app.register(billingRoutes, { prefix: "/api/billing" });
+  app.register(dealRoutes, { prefix: "/api/deal" });
+  app.register(brokerRoutes, { prefix: "/api/broker" });
+  app.register(intelligenceRoutes, { prefix: "/api/intelligence" });
 
   return app;
 };

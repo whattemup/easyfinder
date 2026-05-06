@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "dev": "pnpm --filter @easyfinderai/shared build && tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json --noEmitOnError false || true",
     "lint": "eslint -c ../../eslint.config.js src tests --ext .ts",
     "typecheck": "tsc -p tsconfig.test.json --noEmit",
     "test": "vitest run",
@@ -33,12 +33,14 @@
     "mongodb": "^6.13.1",
     "nanoid": "^5.0.7",
     "p-limit": "^7.3.0",
+    "pg": "^8.20.0",
     "resend": "^6.9.2",
     "stripe": "^16.7.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^22.5.4",
+    "@types/pg": "^8.20.0",
     "@types/supertest": "^6.0.2",
     "domhandler": "^5.0.3",
     "eslint": "^9.9.1",

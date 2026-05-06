@@ -1,0 +1,1112 @@
+===== SYSTEM INFO =====
+Mon May  4 00:58:45 MST 2026
+v25.8.2
+9.6.0
+Linux localhost 5.10.236-android12-9-00006-g71f3aedc8b92-ab14427738 #1 SMP PREEMPT Wed Nov 12 20:20:48 UTC 2025 aarch64 Android
+\n===== PROJECT ROOT =====
+/data/data/com.termux/files/home/easyfinder/EasyFinder-production
+total 349
+drwx------. 14 u0_a52 u0_a52   3452 May  4 00:58 .
+drwx------. 12 u0_a52 u0_a52   3452 May  2 18:44 ..
+-rw-------.  1 u0_a52 u0_a52     95 Apr 13 15:54 .dockerignore
+-rw-------.  1 u0_a52 u0_a52    226 Apr 13 15:54 .easyfinder-context.md
+drwx------.  7 u0_a52 u0_a52   3452 May  3 01:02 .git
+-rw-------.  1 u0_a52 u0_a52     80 Apr 13 15:54 .gitattributes
+drwx------.  3 u0_a52 u0_a52   3452 Apr 13 15:54 .github
+-rw-------.  1 u0_a52 u0_a52    582 Apr 13 15:54 .gitignore
+-rw-------.  1 u0_a52 u0_a52    161 Apr 13 15:54 .npmrc
+drwx------.  2 u0_a52 u0_a52   3452 Apr 13 15:54 .vscode
+-rw-------.  1 u0_a52 u0_a52    739 Apr 13 15:54 Dockerfile
+-rw-------.  1 u0_a52 u0_a52   5932 Apr 13 15:54 README.md
+drwx------.  4 u0_a52 u0_a52   3452 Apr 13 15:54 apps
+drwx------.  3 u0_a52 u0_a52   3452 Apr 13 15:54 archive
+-rwx------.  1 u0_a52 u0_a52   1566 May  4 00:58 audit.sh
+-rw-------.  1 u0_a52 u0_a52    288 May  4 00:58 audit_output.txt
+drwx------.  2 u0_a52 u0_a52   3452 Apr 13 15:54 docs
+-rw-------.  1 u0_a52 u0_a52    451 Apr 13 15:54 eslint.config.js
+-rw-------.  1 u0_a52 u0_a52    784 Apr 13 15:54 fly.toml
+drwx------.  8 u0_a52 u0_a52   3452 May  2 03:12 node_modules
+-rw-------.  1 u0_a52 u0_a52  46706 Apr 13 15:54 openapi.yml
+drwx------.  3 u0_a52 u0_a52   3452 Apr 13 15:54 ops
+-rw-------.  1 u0_a52 u0_a52   1105 Apr 27 10:08 package.json
+drwx------.  3 u0_a52 u0_a52   3452 Apr 13 15:54 packages
+-rw-------.  1 u0_a52 u0_a52 187889 May  2 00:12 pnpm-lock.yaml
+-rw-------.  1 u0_a52 u0_a52     40 Apr 13 15:54 pnpm-workspace.yaml
+drwx------.  3 u0_a52 u0_a52   3452 Apr 13 15:54 product
+drwx------.  3 u0_a52 u0_a52   3452 Apr 13 15:54 project docs
+drwx------.  2 u0_a52 u0_a52   3452 May  2 00:12 scripts
+-rwx------.  1 u0_a52 u0_a52   1202 May  3 01:27 smoke-test.sh
+-rw-------.  1 u0_a52 u0_a52    586 Apr 13 15:54 turbo.json
+-rw-------.  1 u0_a52 u0_a52    272 May  3 01:02 vercel.json
+\n===== PACKAGE.JSON (ROOT) =====
+{
+  "name": "easyfinder",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.6.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "powershell -ExecutionPolicy Bypass -File scripts/clean.ps1",
+    "openapi:validate": "swagger-cli validate ./openapi.yml",
+    "openapi:types": "openapi-typescript ./openapi.yml -o ./apps/web/src/generated/openapi.ts",
+    "repo:snapshot": "powershell -ExecutionPolicy Bypass -File ./scripts/repo-snapshot.ps1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "eslint": "^9.9.1",
+    "only-allow": "^1.2.1",
+    "openapi-typescript": "7.6.1",
+    "prettier": "^3.8.1",
+    "swagger-cli": "4.0.4",
+    "turbo": "^2.7.5",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "papaparse": "^5.5.3"
+  }
+}
+\n===== API PACKAGE.JSON =====
+{
+  "name": "@easyfinderai/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter @easyfinderai/shared build && tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint -c ../../eslint.config.js src tests --ext .ts",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run",
+    "promote-admin": "tsx scripts/promote-admin.ts",
+    "seed-seller-listings": "tsx src/scripts/seed-seller-listings.ts"
+  },
+  "dependencies": {
+    "@easyfinderai/shared": "workspace:*",
+    "@fastify/cors": "^9.0.1",
+    "@fastify/helmet": "11",
+    "@fastify/jwt": "^8.0.1",
+    "@fastify/multipart": "^8.3.1",
+    "@fastify/rate-limit": "^9.0.1",
+    "@trycourier/courier": "^7.3.0",
+    "bcryptjs": "^2.4.3",
+    "cheerio": "^1.2.0",
+    "csv-parse": "^5.5.6",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.28.1",
+    "fastify-raw-body": "^4.2.0",
+    "mongodb": "^6.13.1",
+    "nanoid": "^5.0.7",
+    "p-limit": "^7.3.0",
+    "pg": "^8.20.0",
+    "resend": "^6.9.2",
+    "stripe": "^16.7.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/pg": "^8.20.0",
+    "@types/supertest": "^6.0.2",
+    "domhandler": "^5.0.3",
+    "eslint": "^9.9.1",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.1"
+  }
+}
+\n===== SHARED PACKAGE.JSON =====
+{
+  "name": "@easyfinderai/shared",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./demoImages": {
+      "types": "./dist/demoImages.d.ts",
+      "import": "./dist/demoImages.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsc -w -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint -c ../../eslint.config.js src --ext .ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "eslint": "^9.9.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.1"
+  }
+}
+\n===== DEAL ENGINE =====
+export const ENGINE_VERSION = "1.0.0";
+
+const REPAIR: Record<string, number> = {
+  excellent: 0, good: 0.03, fair: 0.08, poor: 0.18, unknown: 0.06,
+};
+
+const WEAR: Array<[number, number, number]> = [
+  [0, 2000, 0], [2000, 5000, 0.04], [5000, 8000, 0.10],
+  [8000, 12000, 0.18], [12000, Infinity, 0.28],
+];
+
+const r2 = (n: number) => Math.round(n * 100) / 100;
+const r4 = (n: number) => Math.round(n * 10000) / 10000;
+const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+const pct = (n: number) => (n * 100).toFixed(1) + "%";
+
+function calcRoi(fair: number, cost: number) {
+  return cost <= 0 ? 0 : (fair - cost) / cost;
+}
+
+function wearPenalty(hours: number | null, p50: number | null, ask: number) {
+  if (hours === null) return 0;
+  for (const [lo, hi, p] of WEAR) {
+    if (hours >= lo && hours < hi) return p > 0 ? r2((p50 ?? ask) * p) : 0;
+  }
+  return 0;
+}
+
+export interface ListingInput {
+  listing_id: string;
+  asking_price: number;
+  category: string;
+  hours?: number | null;
+  condition?: string;
+  operable?: boolean;
+  distance_miles?: number;
+  is_auction?: boolean;
+  market_p50?: number | null;
+  market_p90?: number | null;
+  repair_estimate?: number | null;
+  resale_value?: number | null;
+  project_value?: number | null;
+}
+
+export interface DealResult {
+  listing_id: string;
+  decision: string;
+  asking_price: number;
+  fair_value: number;
+  costs: {
+    asking_price: number;
+    auction_premium: number;
+    auction_online_fee: number;
+    transport_cost: number;
+    repair_estimate: number;
+    wear_penalty: number;
+    total_acquisition: number;
+  };
+  roi_at_ask: number;
+  negotiation: any[];
+  final_offer: number | null;
+  final_roi: number | null;
+  rationale: string[];
+  flags: string[];
+  confidence: number;
+  version: string;
+}
+
+export function evaluateDeal(raw: ListingInput): DealResult {
+  const l = {
+    listing_id:     raw.listing_id,
+    asking_price:   raw.asking_price,
+    category:       raw.category,
+    hours:          raw.hours ?? null,
+    condition:      (raw.condition ?? "unknown").toLowerCase(),
+    operable:       raw.operable !== false,
+    distance_miles: raw.distance_miles ?? 0,
+    is_auction:     raw.is_auction ?? false,
+    market_p50:     raw.market_p50 ?? null,
+    market_p90:     raw.market_p90 ?? null,
+    repair_estimate: raw.repair_estimate ?? null,
+    resale_value:   raw.resale_value ?? null,
+    project_value:  raw.project_value ?? null,
+  };
+
+  const flags: string[] = [];
+  const rat: string[] = [];
+
+  let ap = 0, aof = 0, tr = 0;
+
+  if (l.is_auction) {
+    ap = l.asking_price * 0.10;
+    aof = 150;
+    rat.push(`Auction: +10% buyer premium ($${fmt(ap)}) + $150 fee.`);
+  }
+
+  if (l.distance_miles > 0) {
+    tr = Math.max(l.distance_miles * 4.5, 350);
+    rat.push(`Transport: ${l.distance_miles} mi = $${fmt(tr)}.`);
+  }
+
+  let rep: number;
+  if (l.repair_estimate !== null) {
+    rep = l.repair_estimate;
+    rat.push(`Repair (provided): $${fmt(rep)}.`);
+  } else {
+    const m = REPAIR[l.condition] ?? 0.06;
+    rep = l.asking_price * m;
+    if (!l.operable) {
+      const s = l.asking_price * 0.15;
+      rep += s;
+      flags.push("NON_OPERABLE");
+      rat.push(`Non-operable: +$${fmt(s)} surcharge.`);
+    }
+    if (l.condition === "unknown") flags.push("UNKNOWN_CONDITION");
+    if (rep > 0) rat.push(`Repair '${l.condition}': $${fmt(rep)}.`);
+  }
+
+  const wear = wearPenalty(l.hours, l.market_p50, l.asking_price);
+  if (wear > 0) rat.push(`Wear penalty: -$${fmt(wear)} off resale.`);
+
+  const total = l.asking_price + ap + aof + tr + rep + wear;
+
+  let fair: number;
+  if (l.resale_value !== null) {
+    fair = l.resale_value - wear;
+    rat.push(`Resale value: $${fmt(l.resale_value)}.`);
+  } else if (l.project_value !== null) {
+    fair = l.project_value;
+    rat.push(`Project value: $${fmt(l.project_value)}.`);
+  } else if (l.market_p50 !== null) {
+    if (l.market_p90 !== null && l.asking_price > l.market_p90) {
+      flags.push("ABOVE_MARKET_P90");
+      rat.push(`Overpriced vs p90 ($${fmt(l.market_p90)}).`);
+    }
+    rat.push(`Fair value base (p50): $${fmt(l.market_p50)}.`);
+    fair = Math.max(l.market_p50 - wear - rep * 0.40, l.market_p50 * 0.30);
+  } else {
+    flags.push("NO_MARKET_DATA");
+    rat.push("No market data — using ask proxy.");
+    fair = l.asking_price * 0.90;
+  }
+
+  const roi = calcRoi(fair, total);
+
+  let decision: string;
+  if (!l.operable && roi < 0.20) {
+    decision = "WALK";
+    rat.push("Non-operable + low ROI → WALK.");
+  } else if (flags.includes("ABOVE_MARKET_P90") && roi < 0) {
+    decision = "WALK";
+    rat.push("Negative ROI → WALK.");
+  } else if (roi >= 0.20) {
+    decision = "BUY";
+    rat.push(`ROI ${pct(roi)} ≥ 20% → BUY.`);
+  } else if (roi >= 0.08) {
+    decision = "NEGOTIATE";
+    rat.push(`ROI ${pct(roi)} in band → NEGOTIATE.`);
+  } else {
+    decision = "WALK";
+    rat.push(`ROI ${pct(roi)} below floor → WALK.`);
+  }
+
+  const negotiation: any[] = [];
+  const sf = l.asking_price * 0.80;
+  let final_offer: number | null = null;
+  let final_roi: number | null = null;
+
+  if (decision === "NEGOTIATE") {
+    let cur = l.asking_price;
+    for (let rnd = 1; rnd <= 3; rnd++) {
+      const target = (fair / 1.20) - (ap + aof + tr) - rep;
+      let counter = Math.max(Math.round((cur - (cur - target) * 0.40) / 100) * 100, sf);
+      const tot2 = counter + (l.is_auction ? counter * 0.10 : 0) + aof + tr + rep + wear;
+      const aroi = calcRoi(fair, tot2);
+      const accepts = counter >= sf * 0.95;
+      const accept = accepts && aroi >= 0.08;
+      const rr = `Round ${rnd}: $${fmt(counter)}, ROI ${pct(aroi)}.`;
+      rat.push(rr);
+      negotiation.push({ round_number: rnd, counter_price: r2(counter), achieved_roi: r4(aroi), accept, rationale: rr });
+      if (accept) { final_offer = r2(counter); final_roi = r4(aroi); break; }
+      cur = counter;
+    }
+    if (final_roi !== null && final_roi < 0.05) {
+      decision = "WALK";
+      rat.push("Negotiation failed → WALK.");
+    }
+  }
+
+  let conf = 1.0;
+  if (l.market_p50 === null)              conf -= 0.25;
+  if (l.hours === null)                   conf -= 0.10;
+  if (l.condition === "unknown")          conf -= 0.10;
+  if (flags.includes("NO_MARKET_DATA"))   conf -= 0.15;
+  if (flags.includes("NON_OPERABLE"))     conf -= 0.10;
+
+  return {
+    listing_id:   l.listing_id,
+    decision,
+    asking_price: l.asking_price,
+    fair_value:   r2(fair),
+    costs: {
+      asking_price:       l.asking_price,
+      auction_premium:    ap,
+      auction_online_fee: aof,
+      transport_cost:     tr,
+      repair_estimate:    rep,
+      wear_penalty:       wear,
+      total_acquisition:  r2(total),
+    },
+    roi_at_ask:   r4(roi),
+    negotiation,
+    final_offer,
+    final_roi,
+    rationale:    rat,
+    flags,
+    confidence:   r2(Math.max(conf, 0.10)),
+    version:      ENGINE_VERSION,
+  };
+}
+\n===== SCORING ENGINE =====
+import type { Listing, ScoreBreakdown, ScoringConfig } from "./types.js";
+
+export const defaultScoringConfig: ScoringConfig = {
+  id: "default",
+  name: "Default",
+  weights: {
+    price: 0.25,
+    hours: 0.2,
+    year: 0.2,
+    location: 0.15,
+    condition: 0.1,
+    completeness: 0.1,
+  },
+  preferredStates: ["CA", "AZ", "TX", "IA"],
+  minHours: 0,
+  maxHours: 8000,
+  minPrice: 0,
+  maxPrice: 250000,
+  minYear: 2000,
+  maxYear: new Date().getFullYear() + 1,
+  minCondition: 1,
+  maxCondition: 5,
+  active: true,
+};
+
+export const DefaultScoringConfig = defaultScoringConfig;
+
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+
+const inferYearFromTitle = (title?: string) => {
+  if (!title) return undefined;
+  const match = title.match(/\b(19|20)\d{2}\b/);
+  if (!match) return undefined;
+  const year = Number(match[0]);
+  return Number.isFinite(year) ? year : undefined;
+};
+
+const stateSpeedBonus = (state: string | undefined, preferredStates: string[]) =>
+  state && preferredStates.includes(state) ? 5 : 0;
+
+const normalizeHours = (hours: number, config: ScoringConfig) => {
+  if (!Number.isFinite(hours)) return 0.5;
+  if (config.maxHours <= config.minHours) return 0.5;
+  return clamp((hours - config.minHours) / (config.maxHours - config.minHours), 0, 1);
+};
+
+const normalizePrice = (price: number, config: ScoringConfig) => {
+  if (!Number.isFinite(price)) return 0.5;
+  if (config.maxPrice <= config.minPrice) return 0.5;
+  return clamp((price - config.minPrice) / (config.maxPrice - config.minPrice), 0, 1);
+};
+
+type Reason = ScoreBreakdown["reasons"][number];
+const reason = (kind: Reason["kind"], message: string): Reason => ({ kind, message });
+
+const ageInDays = (iso?: string) => {
+  if (!iso) return undefined;
+  const parsed = Date.parse(iso);
+  if (Number.isNaN(parsed)) return undefined;
+  return (Date.now() - parsed) / (1000 * 60 * 60 * 24);
+};
+
+export function scoreListingV2(listing: Listing, config: ScoringConfig): ScoreBreakdown {
+  const operableFlag = listing.is_operable !== undefined ? listing.is_operable : listing.operable;
+  const flags: string[] = [];
+
+  if (operableFlag === false) {
+    flags.push("NON_OPERABLE", "NOT_BEST_OPTION_ELIGIBLE");
+    return {
+      total: 0,
+      breakdown: { deal: 0, usage: 0, risk: 0, speed: 0 },
+      scoreV2: { deal: 0, usage: 0, risk: 0, speed: 0 },
+      reasons: [reason("risk", "Listing marked as not operable.")],
+      flags,
+      confidence: 0,
+      confidenceScore: 0,
+      bestOptionEligible: false,
+      disqualified: true,
+    };
+  }
+
+  const price = Number.isFinite(listing.price) ? listing.price : Number.NaN;
+  const hours = Number.isFinite(listing.hours) ? listing.hours : Number.NaN;
+  const inferredYear = inferYearFromTitle(listing.title);
+  const year = Number.isFinite(listing.year) ? listing.year : inferredYear ?? Number.NaN;
+
+  const priceNorm = normalizePrice(price, config);
+  const hoursNorm = normalizeHours(hours, config);
+  const valuePressure = clamp(priceNorm * 0.65 + hoursNorm * 0.35 + priceNorm * hoursNorm * 0.5, 0, 1.5);
+  let deal = clamp(Math.round((1 - valuePressure / 1.5) * 100), 0, 100);
+
+  const dealReasons: Reason[] = [];
+  if (deal >= 70) {
+    dealReasons.push(reason("deal", "Strong value for hours (price low relative to usage)."));
+  } else if (deal <= 40) {
+    dealReasons.push(reason("deal", "Price is high for the listed hours."));
+  } else {
+    dealReasons.push(reason("deal", "Price and usage are reasonably balanced."));
+  }
+
+  if (!Number.isFinite(price)) {
+    deal = clamp(deal - 18, 0, 100);
+    dealReasons.push(reason("deal", "Price missing; value estimate is less reliable."));
+    flags.push("MISSING_PRICE");
+  }
+
+  if (!Number.isFinite(hours)) {
+    deal = clamp(deal - 12, 0, 100);
+    dealReasons.push(reason("deal", "Hours missing; value estimate is less reliable."));
+    flags.push("MISSING_HOURS");
+  }
+
+  let usage = clamp(Math.round((1 - hoursNorm) * 100), 0, 100);
+  const usageReasons: Reason[] = [];
+  if (usage >= 70) {
+    usageReasons.push(reason("usage", "Low hours for category."));
+  } else if (usage <= 35) {
+    usageReasons.push(reason("usage", "High hours (wear risk)."));
+  } else {
+    usageReasons.push(reason("usage", "Usage is moderate for this category."));
+  }
+
+  if (Number.isFinite(year)) {
+    const yearNorm = clamp((year - config.minYear) / Math.max(1, config.maxYear - config.minYear), 0, 1);
+    const yearBonus = Math.round((yearNorm - 0.5) * 16);
+    usage = clamp(usage + yearBonus, 0, 100);
+    usageReasons.push(
+      reason(
+        "usage",
+        yearBonus >= 0
+          ? "Newer model year slightly improves usage outlook."
+          : "Older model year slightly reduces usage outlook."
+      )
+    );
+  }
+
+  let risk = 70;
+  const riskReasons: Reason[] = [];
+  if (listing.verifiedSeller) {
+    risk += 8;
+    riskReasons.push(reason("risk", "Verified seller lowers transaction risk."));
+  } else {
+    risk -= 5;
+    riskReasons.push(reason("risk", "Unverified seller adds transaction risk."));
+  }
+
+  if (listing.hasInspectionReport) {
+    risk += 10;
+    riskReasons.push(reason("risk", "Inspection report available."));
+  }
+
+  if (listing.hasServiceHistory) {
+    risk += 8;
+    riskReasons.push(reason("risk", "Service history provided."));
+  }
+
+  const photos = Number.isFinite(listing.photoCount) ? listing.photoCount : listing.images?.length;
+  if (!Number.isFinite(photos ?? Number.NaN)) {
+    risk -= 10;
+    riskReasons.push(reason("risk", "Photo count missing; visual verification risk is higher."));
+  } else if ((photos ?? 0) < 5) {
+    risk -= 10;
+    riskReasons.push(reason("risk", "Low photo count increases inspection uncertainty."));
+  }
+
+  if (!Number.isFinite(price)) {
+    risk -= 8;
+    riskReasons.push(reason("risk", "Missing price increases negotiation uncertainty."));
+  }
+
+  if (!Number.isFinite(hours)) {
+    risk -= 8;
+    riskReasons.push(reason("risk", "Missing hours increases wear uncertainty."));
+  }
+
+  if (!listing.state) {
+    risk -= 6;
+    riskReasons.push(reason("risk", "Missing state increases logistics uncertainty."));
+  }
+
+  const staleDays = ageInDays(listing.lastSeenAt ?? listing.listingUpdatedAt);
+  if (typeof staleDays === "number" && staleDays > 14) {
+    risk -= 8;
+    flags.push("STALE_LISTING");
+    riskReasons.push(reason("risk", "Listing appears stale; availability risk is higher."));
+  }
+
+  risk = clamp(Math.round(risk), 0, 100);
+
+  let speed = 50;
+  const speedReasons: Reason[] = [];
+  const sellerType = listing.sellerType ?? "unknown";
+  const availability = listing.availability ?? "unknown";
+
+  if (sellerType === "dealer") {
+    speed += 20;
+    speedReasons.push(reason("speed", "Dealer listing tends to close and deliver faster."));
+  } else if (sellerType === "auction") {
+    speed -= 12;
+    speedReasons.push(reason("speed", "Auction listings often have slower acquisition cycles."));
+  }
+
+  if (availability === "in_stock") {
+    speed += 12;
+    speedReasons.push(reason("speed", "In-stock status improves acquisition speed."));
+  } else if (availability === "scheduled_auction") {
+    speed -= 10;
+    speedReasons.push(reason("speed", "Scheduled auction timing can delay acquisition."));
+  }
+
+  if (listing.shippingAvailable) {
+    speed += 10;
+    speedReasons.push(reason("speed", "Shipping available supports faster delivery."));
+  }
+
+  const locationBonus = stateSpeedBonus(listing.state, config.preferredStates);
+  if (locationBonus > 0) {
+    speed += locationBonus;
+    speedReasons.push(reason("speed", `Preferred state (${listing.state}) slightly improves logistics speed.`));
+  }
+
+  if (typeof staleDays === "number" && staleDays > 14) {
+    speed -= 10;
+    speedReasons.push(reason("speed", "Stale listing may indicate slower seller responsiveness."));
+  }
+  speed = clamp(Math.round(speed), 0, 100);
+
+  let confidenceScore = 100;
+  if (!Number.isFinite(price)) confidenceScore -= 20;
+  if (!Number.isFinite(hours)) confidenceScore -= 20;
+  if (!listing.state) { confidenceScore -= 12; flags.push("MISSING_STATE"); }
+  if (!listing.description?.trim()) confidenceScore -= 8;
+  if (!Number.isFinite(photos ?? Number.NaN)) confidenceScore -= 8;
+  else if ((photos ?? 0) < 5) confidenceScore -= 8;
+  if (!listing.verifiedSeller) confidenceScore -= 8;
+  if (!listing.source || listing.source === "unknown") confidenceScore -= 6;
+  if (typeof staleDays === "number" && staleDays > 14) confidenceScore -= 10;
+  confidenceScore = clamp(Math.round(confidenceScore), 0, 100);
+
+  const total = clamp(Math.round(deal * 0.25 + usage * 0.25 + risk * 0.25 + speed * 0.25), 0, 100);
+  const bestOptionEligible = !flags.includes("NON_OPERABLE") && confidenceScore >= 60 && risk >= 40;
+
+  if (confidenceScore < 60) flags.push("LOW_CONFIDENCE");
+  if (!bestOptionEligible) flags.push("NOT_BEST_OPTION_ELIGIBLE");
+
+  const reasons = [
+    dealReasons[0],
+    usageReasons[0],
+    riskReasons[0],
+    speedReasons[0],
+    ...dealReasons.slice(1),
+    ...usageReasons.slice(1),
+    ...riskReasons.slice(1),
+    ...speedReasons.slice(1),
+  ].filter((item): item is Reason => Boolean(item)).slice(0, 8);
+
+  return {
+    total,
+    breakdown: { deal, usage, risk, speed },
+    scoreV2: { deal, usage, risk, speed },
+    reasons,
+    flags: [...new Set(flags)],
+    confidence: Number((confidenceScore / 100).toFixed(2)),
+    confidenceScore,
+    bestOptionEligible,
+    disqualified: !bestOptionEligible,
+  };
+}
+
+export function scoreListing(listing: Listing, config: ScoringConfig): ScoreBreakdown {
+  return scoreListingV2(listing, config);
+}
+\n===== API ROUTE =====
+// apps/api/src/routes/deal.ts
+import type { FastifyInstance } from "fastify";
+import { evaluateDeal, checkDealEngineHealth, DealRequest } from "../lib/dealClient.js";
+import { ok, fail } from "../response.js";
+
+export default async function dealRoutes(app: FastifyInstance) {
+  /**
+   * GET /api/deal/health
+   * Check if the Python deal engine is reachable
+   */
+  app.get("/health", async (request, reply) => {
+    const alive = await checkDealEngineHealth();
+    if (!alive) {
+      return reply.status(503).send({
+        error: { code: "DEAL_ENGINE_UNAVAILABLE", message: "Deal engine is not reachable." },
+        requestId: request.requestId,
+      });
+    }
+    return ok(request, { dealEngine: "ok" });
+  });
+
+  /**
+   * POST /api/deal/evaluate
+   * Evaluate a listing through the Python margin engine
+   * Auth required
+   */
+  app.post(
+    "/evaluate",
+    { preHandler: app.authenticate },
+    async (request, reply) => {
+      const body = request.body as DealRequest;
+
+      if (!body?.asking_price || !body?.listing_id) {
+        return fail(request, reply, "BAD_REQUEST", "asking_price and listing_id are required.", 400);
+      }
+
+      try {
+        const result = await evaluateDeal(body);
+        return ok(request, result);
+      } catch (err: any) {
+        app.log.error(err, "Deal engine evaluation failed");
+        return fail(request, reply, "DEAL_ENGINE_ERROR", err.message ?? "Evaluation failed.", 502);
+      }
+    }
+  );
+}
+\n===== HMAC VERIFY =====
+import { createHmac } from "crypto";
+
+const SECRET = process.env.HMAC_SECRET ?? "dev-secret";
+
+export function signToken(payload: string): string {
+  return createHmac("sha256", SECRET).update(payload).digest("hex");
+}
+
+export function verifyToken(payload: string, token: string): boolean {
+  const expected = signToken(payload);
+  // Constant-time compare
+  if (expected.length !== token.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < expected.length; i++) {
+    mismatch |= expected.charCodeAt(i) ^ token.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+// CLI smoke test: node verifyHmac.ts <payload> <token>
+if (process.argv[2] && process.argv[3]) {
+  const ok = verifyToken(process.argv[2], process.argv[3]);
+  console.log(ok ? "✅ VALID" : "❌ INVALID");
+}
+\n===== AUTH ROUTES =====
+import { FastifyInstance } from "fastify";
+import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
+import { ObjectId } from "mongodb";
+import { fail, ok } from "../response.js";
+import type { UserRole } from "../auth.js";
+import { getUsersCollection, UserDocument } from "../users.js";
+import { defaultBilling } from "../billing.js";
+import { sendPasswordResetEmail } from "../email.js";
+import { getPasswordResetTokensCollection } from "../passwordResetTokens.js";
+import { audit } from "../lib/audit.js";
+
+const toUserDto = (user: UserDocument) => ({
+  id: user._id.toHexString(),
+  email: user.email,
+  name: user.name,
+  role: user.role,
+});
+
+const normalizeRole = (role: string | null | undefined): UserRole => {
+  if (role === "demo" || role === "buyer" || role === "seller" || role === "admin" || role === "enterprise") {
+    return role;
+  }
+
+  return "demo";
+};
+
+const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  name: z.string().optional(),
+});
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1),
+  newPassword: z.string().min(8),
+});
+
+const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000;
+
+export default async function authRoutes(app: FastifyInstance) {
+  const usersCollection = () => getUsersCollection();
+  const passwordResetTokensCollection = () => getPasswordResetTokensCollection();
+
+  app.post("/register", {
+    config: {
+      rateLimit: {
+        max: 60,
+        timeWindow: "1 minute",
+      },
+    },
+  }, async (request, reply) => {
+    const col = usersCollection();
+    const payload = registerSchema.parse(request.body);
+    const emailLower = payload.email.toLowerCase();
+    const existing = await col.findOne({ emailLower });
+    if (existing) {
+      return fail(request, reply, "EMAIL_EXISTS", "Email already registered.", 400);
+    }
+
+    const passwordHash = await bcrypt.hash(payload.password, 10);
+    const now = new Date();
+    const userDocument: UserDocument = {
+      _id: new ObjectId(),
+      email: payload.email,
+      emailLower,
+      name: payload.name ?? "New User",
+      role: null,
+      passwordHash,
+      ndaAccepted: false,
+      ndaAcceptedAt: null,
+      billing: defaultBilling(),
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    try {
+      await col.insertOne(userDocument);
+    } catch (error: any) {
+      if (error?.code === 11000) {
+        return fail(request, reply, "EMAIL_EXISTS", "Email already registered.", 400);
+      }
+      throw error;
+    }
+
+    const token = await reply.jwtSign({
+      id: userDocument._id.toHexString(),
+      email: userDocument.email,
+      role: "demo",
+      name: userDocument.name,
+    });
+
+    return ok(request, {
+      token,
+      user: toUserDto(userDocument),
+    });
+  });
+
+  app.post("/login", {
+    config: {
+      rateLimit: {
+        max: 80,
+        timeWindow: "1 minute",
+      },
+    },
+  }, async (request, reply) => {
+    const col = usersCollection();
+    const payload = loginSchema.parse(request.body);
+    const emailLower = payload.email.toLowerCase();
+    const user = await col.findOne({ emailLower });
+    if (!user) {
+      return fail(request, reply, "INVALID_CREDENTIALS", "Invalid credentials.", 401);
+    }
+
+    if (!user.passwordHash) {
+      return fail(request, reply, "INVALID_CREDENTIALS", "Invalid credentials.", 401);
+    }
+
+    const valid = await bcrypt.compare(payload.password, user.passwordHash);
+    if (!valid) {
+      return fail(request, reply, "INVALID_CREDENTIALS", "Invalid credentials.", 401);
+    }
+
+    const token = await reply.jwtSign({
+      id: user._id.toHexString(),
+      email: user.email,
+      role: normalizeRole(user.role),
+      name: user.name,
+    });
+
+    audit("USER_LOGIN", {
+      userId: user._id.toHexString(),
+      email: user.email,
+      ip: request.ip,
+    });
+
+    return ok(request, {
+      token,
+      user: toUserDto(user),
+    });
+  });
+
+  app.post("/forgot-password", async (request) => {
+    const usersCol = usersCollection();
+    const payload = forgotPasswordSchema.parse(request.body);
+    const emailLower = payload.email.toLowerCase();
+    const user = await usersCol.findOne({ emailLower });
+
+    if (user) {
+      audit("PASSWORD_RESET_REQUESTED", {
+        userId: user._id.toHexString(),
+        email: user.email,
+        ip: request.ip,
+      });
+
+      const token = randomBytes(32).toString("hex");
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + PASSWORD_RESET_TTL_MS);
+
+      await passwordResetTokensCollection().insertOne({
+        _id: new ObjectId(),
+        user_id: user._id,
+        token,
+        created_at: now,
+        expires_at: expiresAt,
+      });
+
+      await sendPasswordResetEmail(user.email, token);
+    }
+
+    return ok(request, { success: true });
+  });
+
+  app.post("/reset-password", async (request, reply) => {
+    const usersCol = usersCollection();
+    const tokensCol = passwordResetTokensCollection();
+    const payload = resetPasswordSchema.parse(request.body);
+
+    const resetToken = await tokensCol.findOne({
+      token: payload.token,
+      expires_at: { $gt: new Date() },
+    });
+
+    if (!resetToken) {
+      return fail(request, reply, "INVALID_TOKEN", "Invalid or expired reset token.", 400);
+    }
+
+    const passwordHash = await bcrypt.hash(payload.newPassword, 10);
+
+    await usersCol.updateOne(
+      { _id: resetToken.user_id },
+      {
+        $set: {
+          passwordHash,
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    await tokensCol.deleteOne({ _id: resetToken._id });
+
+    return ok(request, { success: true });
+  });
+
+  app.get("/me", { preHandler: app.authenticate }, async (request, reply) => {
+    const col = usersCollection();
+    if (!ObjectId.isValid(request.user.id)) {
+      return fail(request, reply, "NOT_FOUND", "User not found.", 404);
+    }
+    const user = await col.findOne({ _id: new ObjectId(request.user.id) });
+    if (!user) {
+      return fail(request, reply, "NOT_FOUND", "User not found.", 404);
+    }
+    return ok(request, toUserDto(user));
+  });
+}
+\n===== DB CONFIG =====
+import { Collection, Db, Document, GridFSBucket, MongoClient } from "mongodb";
+import { env } from "./env.js";
+
+let client: MongoClient | null = null;
+let db: Db | null = null;
+let connectPromise: Promise<Db> | null = null;
+
+export const connectToDatabase = async () => {
+  if (db) return db;
+
+  if (!env.MONGO_URL || !env.DB_NAME) {
+    throw new Error("Missing required Mongo configuration (MONGO_URL, DB_NAME).");
+  }
+
+  if (!connectPromise) {
+    client = new MongoClient(env.MONGO_URL);
+    connectPromise = client
+      .connect()
+      .then(async (connected: MongoClient) => {
+        db = connected.db(env.DB_NAME);
+        await db.collection("users").createIndex({ emailLower: 1 }, { unique: true });
+        await db.collection("users").createIndex({ "billing.stripe_customer_id": 1 });
+        await db.collection("listings").createIndex({ status: 1, isPublished: 1 });
+        await db.collection("listings").createIndex({ source: 1, updatedAt: -1 });
+        await db
+          .collection("listings")
+          .createIndex(
+            { source: 1, sourceExternalId: 1 },
+            {
+              unique: true,
+              name: "source_1_sourceExternalId_1",
+              partialFilterExpression: { sourceExternalId: { $exists: true } },
+            }
+          );
+        await db.collection("password_reset_tokens").createIndex({ token: 1 }, { unique: true });
+        await db
+          .collection("password_reset_tokens")
+          .createIndex({ expires_at: 1 }, { expireAfterSeconds: 0 });
+        await db.collection("offers").createIndex({ listingId: 1 });
+        await db.collection("offers").createIndex({ buyerId: 1 });
+        await db.collection("offers").createIndex({ sellerId: 1 });
+        await db.collection("offers").createIndex({ status: 1 });
+        return db;
+      })
+      .catch((error: unknown) => {
+        connectPromise = null;
+        throw error;
+      });
+  }
+
+  return connectPromise;
+};
+
+
+export const closeDatabaseConnection = async () => {
+  if (client) {
+    await client.close();
+  }
+  client = null;
+  db = null;
+  connectPromise = null;
+};
+
+export const getDb = () => {
+  if (!db) {
+    throw new Error("Database not initialized. Call connectToDatabase() on startup.");
+  }
+  return db;
+};
+
+export const getCollection = <T extends Document = Document>(name: string): Collection<T> =>
+  getDb().collection<T>(name);
+
+let uploadsBucket: GridFSBucket | null = null;
+
+export const getUploadsBucket = () => {
+  if (!uploadsBucket) {
+    uploadsBucket = new GridFSBucket(getDb(), { bucketName: "uploads" });
+  }
+
+  return uploadsBucket;
+};
+\n===== ENV (SANITIZED) =====
+STRIPE_SECRET_KEY=***HIDDEN***
+STRIPE_PRICE_ID_PRO=***HIDDEN***
+STRIPE_PRICE_ID_ENTERPRISE=***HIDDEN***
+STRIPE_WEBHOOK_SECRET=***HIDDEN***
+ANTHROPIC_API_KEY=***HIDDEN***
+JWT_SECRET=***HIDDEN***
+PORT=***HIDDEN***
+HOST=***HIDDEN***
+NODE_ENV=***HIDDEN***
+DATABASE_URL=***HIDDEN***
+DATABASE_URL=***HIDDEN***
+MONGO_URL=***HIDDEN***
+DB_NAME=***HIDDEN***
+CORS_ORIGINS=***HIDDEN***
+DEMO_MODE=***HIDDEN***
+CLIENT_URL=***HIDDEN***
+DB_HOST=***HIDDEN***
+DB_PORT=***HIDDEN***
+DB_USER=***HIDDEN***
+DB_PASSWORD=***HIDDEN***
+BILLING_ENABLED=***HIDDEN***
+RESEND_API_KEY=***HIDDEN***
+RESEND_FROM=***HIDDEN***
+EMAIL_ENABLED=***HIDDEN***
+\n===== TEST FILES =====
+\n===== SAMPLE TEST CONTENT =====
+\n===== RUN TESTS =====
+
+> @easyfinderai/shared@0.0.0 test /data/data/com.termux/files/home/easyfinder/EasyFinder-production/packages/shared
+> vitest run
+
+
+ RUN  v2.1.9 /data/data/com.termux/files/home/easyfinder/EasyFinder-production/packages/shared
+
+ ❯ tests/scoring.test.ts (15 tests | 10 failed) 59ms
+   × scoreListing > returns zero when listing is not operable 22ms
+     → Cannot read properties of undefined (reading 'operable')
+   × scoreListing > prefers listings in preferred states 3ms
+     → Cannot read properties of undefined (reading 'state')
+   × scoreListing > rewards lower hours and lower price 2ms
+     → Cannot read properties of undefined (reading 'hours')
+   × risk signals > verified_partner scores higher than unknown source 1ms
+     → Cannot read properties of undefined (reading 'risk')
+   × risk signals > inspection_report boosts risk score 4ms
+     → Cannot read properties of undefined (reading 'risk')
+   × risk signals > service_history boosts risk score 3ms
+     → Cannot read properties of undefined (reading 'risk')
+   × risk signals > stale listing reduces confidence and adds flag 4ms
+     → expected 84 to be greater than 84
+   × category benchmarks > excavator at p50 scores higher price than forklift at p50 2ms
+     → Cannot read properties of undefined (reading 'price')
+   × category benchmarks > excavator above p90 gets low price score 2ms
+     → Cannot read properties of undefined (reading 'price')
+   × category benchmarks > crane at p50 gets high price score 2ms
+     → Cannot read properties of undefined (reading 'price')
+
+ Test Files  1 failed (1)
+      Tests  10 failed | 5 passed (15)
+   Start at  00:58:50
+   Duration  2.09s (transform 263ms, setup 0ms, collect 308ms, tests 59ms, environment 0ms, prepare 381ms)
+
+/data/data/com.termux/files/home/easyfinder/EasyFinder-production/packages/shared:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @easyfinderai/shared@0.0.0 test: `vitest run`
+Exit status 1
+\n===== DB TABLES =====
+\n===== SAMPLE API RESPONSE =====
+\n===== DONE =====

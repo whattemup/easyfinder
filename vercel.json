@@ -1,4 +1,7 @@
 {
+  "buildCommand": "pnpm --filter @easyfinderai/shared build && pnpm --filter @easyfinderai/web build",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "pnpm install",
   "rewrites": [
     {
       "source": "/((?!.*\\.).*)",

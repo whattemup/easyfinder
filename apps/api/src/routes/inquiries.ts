@@ -98,7 +98,7 @@ export default async function inquiriesRoutes(app: FastifyInstance) {
     if (reasonType) {
       await insertAuditEvent({
         actorUserId: request.user.id,
-        actorEmail: request.user.email,
+        actorEmail: request.user.email ?? "",
         action: "MESSAGE_BLOCKED",
         targetType: "inquiry",
         targetId: payload.listingId,
@@ -168,6 +168,25 @@ export default async function inquiriesRoutes(app: FastifyInstance) {
     };
 
     await getInquiriesCollection().insertOne(inquiry);
+
+    // Send email notification to seller
+    try {
+      if (sellerId && ObjectId.isValid(sellerId)) {
+        const seller = await usersCollection.findOne({ _id: new ObjectId(sellerId) });
+        if (seller?.email) {
+          const { sendInquiryNotificationEmail } = await import("../email.js");
+          await sendInquiryNotificationEmail({
+            to: seller.email,
+            buyerName: buyer.name,
+            buyerEmail: buyer.email,
+            listingTitle: listing?.title ?? payload.listingId,
+            message,
+          });
+        }
+      }
+    } catch (emailErr) {
+      request.log.warn({ emailErr }, "Failed to send inquiry email");
+    }
 
     return ok(request, toInquiryDto(inquiry));
   });
