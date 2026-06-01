@@ -1,15 +1,31 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import { z } from "zod";
+
+// Load both the current working directory .env and the API package .env.
+// This keeps direct imports of env.ts consistent whether the process starts
+// from the repo root, apps/api, or a deployment builder.
+dotenv.config();
+dotenv.config({ path: new URL("../.env", import.meta.url), override: false });
 
 /**
  * EasyFinder API environment validation (Zod)
- * - Fails fast with readable errors
+ * - Fails fast with readable errors at runtime
  * - Avoids "optional integration takes down prod" footguns
  *
  * IMPORTANT:
  * - Core app (auth, listings, etc.) must boot in production even if Stripe isn't configured yet.
  * - Stripe + Resend are OPTIONAL unless explicitly enabled via BILLING_ENABLED / EMAIL_ENABLED.
+ * - Vercel may import files during its build/analyze phase; skip only runtime-only
+ *   required-secret validation during that phase so web deployments are not bricked
+ *   by the separate Fly.io API configuration.
  */
+
+export const isVercelBuildPhase =
+  process.env.VERCEL === "1" &&
+  process.env.CI === "1" &&
+  process.env.EASYFINDER_FORCE_RUNTIME_VALIDATION !== "true";
+
+const runtimeRequiredKeys = ["JWT_SECRET", "MONGO_URL", "DB_NAME"] as const;
 
 const EnvSchema = z
   .object({
@@ -50,10 +66,11 @@ const EnvSchema = z
       .default("true")
       .pipe(z.boolean()),
 
-    // Security / Auth (required)
+    // Security / Auth (required at runtime)
     JWT_SECRET: z
       .string()
-      .min(16, "JWT_SECRET must be at least 16 characters (use a long random string)"),
+      .min(16, "JWT_SECRET must be at least 16 characters (use a long random string)")
+      .optional(),
 
     // CORS (comma-separated list of origins)
     CORS_ORIGINS: z
@@ -62,9 +79,9 @@ const EnvSchema = z
       .transform((s) => s.split(",").map((x) => x.trim()).filter(Boolean))
       .refine((arr) => arr.length > 0),
 
-    // Mongo (required)
-    MONGO_URL: z.string().min(1, "MONGO_URL is required"),
-    DB_NAME: z.string().min(1, "DB_NAME is required"),
+    // Mongo (required at runtime)
+    MONGO_URL: z.string().min(1, "MONGO_URL is required").optional(),
+    DB_NAME: z.string().min(1, "DB_NAME is required").optional(),
 
     // App base URL (used for building absolute links in emails)
     // Local: http://localhost:5173
@@ -97,6 +114,18 @@ const EnvSchema = z
     LAUNCH_DATE: z.string().datetime().default("2026-02-01T00:00:00.000Z"),
   })
   .superRefine((values, ctx) => {
+    if (isVercelBuildPhase) return;
+
+    for (const key of runtimeRequiredKeys) {
+      if (!values[key]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: `${key} is required`,
+        });
+      }
+    }
+
     if (values.NODE_ENV !== "production") return;
 
     // Only enforce Stripe if billing is enabled
@@ -152,8 +181,16 @@ const parsed = EnvSchema.safeParse({ ...process.env, ...testDefaults });
 if (!parsed.success) {
   throw new Error(
     "❌ Invalid environment variables:\n" +
-      parsed.error.issues.map((i) => `- ${i.path.join(".")}: ${i.message}`).join("\n")
+      parsed.error.issues.map((i) => `- ${i.path.join(".")}: ${i.message}`).join("\n") +
+      "\n\nSet these in your API runtime environment. For the documented deployment split, " +
+      "Vercel should build apps/web and the API runs on Fly.io. If Vercel is only " +
+      "building the web app, set the Vercel project Root Directory to apps/web or " +
+      "keep API runtime variables out of the web build path."
   );
 }
 
-export const env = parsed.data;
+export const env = parsed.data as typeof parsed.data & {
+  JWT_SECRET: string;
+  MONGO_URL: string;
+  DB_NAME: string;
+};
